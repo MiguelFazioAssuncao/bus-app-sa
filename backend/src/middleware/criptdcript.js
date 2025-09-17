@@ -30,7 +30,7 @@ export async function getUserCrypto(email, plainPassword) {
   // variáveis originais
   const name = user.name
   const emailOriginal = user.email
-  const password = plainPassword // senha digitada, não a hash
+  const password = plainPassword // senha digitada
 
   // criptografadas
   const nameCrypt = crypt(name)
@@ -48,3 +48,5 @@ export async function getUserCrypto(email, plainPassword) {
     decrypted: { nameDecrypted, emailDecrypted, passDecrypted }
   }
 }
+export default User;
+

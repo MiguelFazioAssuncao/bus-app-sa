@@ -2,6 +2,8 @@ import { DataTypes } from "sequelize";
 import sequelize from "../database/client.js";
 import User from "./User.js";
 
+
+//requisição reset
 const PasswordResetToken = sequelize.define("PasswordResetToken", {
   id: {
     type: DataTypes.INTEGER,
