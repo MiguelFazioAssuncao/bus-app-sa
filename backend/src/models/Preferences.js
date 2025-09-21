@@ -34,12 +34,18 @@ const Preferences = sequelize.define("Preferences", {
     }
 });
 
-Preferences.updateHome = async (userId, homeName, distance, time) => {
-    const preferences = await Preferences.findOne({ where: { userId } });
+
+Preferences.updateLocation = async (userId, type, name, distance, time) => {
+    if (!['home', 'work'].includes(type)) throw new Error('Tipo inválido');
+    let preferences = await Preferences.findOne({ where: { userId } });
+    const value = `${name} - ${distance}m, ${time}min`;
     if (!preferences) {
-        throw new Error("Preferences not found for the user.");
+        const data = { userId };
+        data[type] = value;
+        await Preferences.create(data);
+        return;
     }
-    preferences.home = `${homeName} - ${distance}m, ${time}min`;
+    preferences[type] = value;
     await preferences.save();
 };
 

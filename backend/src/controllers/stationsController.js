@@ -37,24 +37,42 @@ export const getRoute = async (req, res) => {
         });
     }
 
-    const response = await axiosInstance.get(`/route`, {
-      params: {
-        point: [point1, point2],
-        profile: "car",
-        locale: "pt-BR",
-        instructions: true,
-      },
-      paramsSerializer: (params) => {
-        return Object.keys(params)
-          .map((key) => {
-            if (Array.isArray(params[key])) {
-              return params[key].map((val) => `${key}=${val}`).join("&");
-            }
-            return `${key}=${params[key]}`;
-          })
-          .join("&");
-      },
-    });
+    let response;
+    try {
+      response = await axiosInstance.get(`/route`, {
+        params: {
+          point: [point1, point2],
+          profile: "car",
+          locale: "pt-BR",
+          instructions: true,
+        },
+        paramsSerializer: (params) => {
+          return Object.keys(params)
+            .map((key) => {
+              if (Array.isArray(params[key])) {
+                return params[key].map((val) => `${key}=${val}`).join("&");
+              }
+              return `${key}=${params[key]}`;
+            })
+            .join("&");
+        },
+      });
+      console.log("Resposta completa da API GraphHopper:", JSON.stringify(response.data, null, 2));
+    } catch (apiErr) {
+      console.error("Erro ao chamar GraphHopper:", apiErr?.response?.data || apiErr.message);
+      return res.status(502).json({
+        message: "Erro ao obter rota do GraphHopper.",
+        error: apiErr?.response?.data || apiErr.message
+      });
+    }
+
+    if (!response.data || !Array.isArray(response.data.paths) || !response.data.paths.length) {
+      console.error("Resposta inesperada da API GraphHopper:", JSON.stringify(response.data, null, 2));
+      return res.status(502).json({
+        message: "Falha ao obter rota do GraphHopper.",
+        response: response.data
+      });
+    }
 
     const distance = Math.round(response.data.paths[0].distance);
     const timeInMinutes = Math.round(response.data.paths[0].time / 60000);
@@ -64,6 +82,7 @@ export const getRoute = async (req, res) => {
 
     res.status(200).json(response.data);
   } catch (err) {
+    console.error("Erro inesperado em getRoute:", err);
     res
       .status(500)
       .json({ message: "Internal server error", error: err.message });
