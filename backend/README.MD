@@ -9,7 +9,6 @@ Este projeto é o backend para o aplicativo de transporte Bus App SA, desenvolvi
 - [Execução local](#execução-local)
 - [Execução com Docker](#execução-com-docker)
 - [Endpoints principais](#endpoints-principais)
-- [Exemplos de requisições](#exemplos-de-requisições)
 
 ---
 
