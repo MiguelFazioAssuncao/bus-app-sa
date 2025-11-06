@@ -16,13 +16,16 @@ const Login = () => {
     setErrorMsg("");
 
     try {
-      const response = await axios.post("http://localhost:8000/login", {
+      const response = await axios.post("http://localhost:3000/auth/login", {
         email,
         password,
       });
 
+      if (response?.data?.token) {
+        localStorage.setItem("token", response.data.token);
+      }
       alert("Login successful!");
-      navigate("/dashboard"); 
+      navigate("/");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMsg(error.response?.data?.message || "Error logging in");

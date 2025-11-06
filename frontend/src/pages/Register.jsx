@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
@@ -24,7 +24,7 @@ const Register = () => {
         password,
       });
 
-      const response = await axios.post("http://localhost:8000/users", {
+      const response = await axios.post("http://localhost:3000/auth/register", {
         name: fullName,
         email,
         password,   
