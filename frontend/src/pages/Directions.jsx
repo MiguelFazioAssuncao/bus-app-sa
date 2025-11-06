@@ -6,7 +6,7 @@ import { faHouse, faPersonWalking, faBriefcase } from "@fortawesome/free-solid-s
 
 const Directions = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [modalType, setModalType] = React.useState(null); // 'home' | 'work'
+  const [modalType, setModalType] = React.useState(null); 
   const [name, setName] = React.useState("");
   const [point1, setPoint1] = React.useState("");
   const [point2, setPoint2] = React.useState("");
@@ -16,7 +16,6 @@ const Directions = () => {
   const [homeInfo, setHomeInfo] = React.useState({ name: "Home", time: "26 min", distance: "2.4km" });
   const [workInfo, setWorkInfo] = React.useState({ name: "Work", time: null, distance: null });
 
-  // Load from localStorage first, then hydrate from backend
   React.useEffect(() => {
     try {
       const h = JSON.parse(localStorage.getItem('homeInfo') || 'null');
