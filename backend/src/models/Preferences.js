@@ -2,6 +2,11 @@ import { DataTypes } from "sequelize";
 import sequelize from "../database/client.js";
 
 const Preferences = sequelize.define("Preferences", {
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        unique: true,
+    },
     home: {
         type: DataTypes.STRING,
         allowNull: true

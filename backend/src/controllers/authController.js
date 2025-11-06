@@ -1,4 +1,3 @@
-
 import User from "../models/User.js"; // Importa o modelo de usuário
 import bcrypt from "bcrypt" // Importa biblioteca para hash de senha
 import jwt from "jsonwebtoken"; // Importa biblioteca para geração de token JWT
@@ -23,7 +22,9 @@ export const register = async (req, res) => {
             password: hashedPassword
         });
 
-        res.status(201).json({ message: "User created successfully", user }); // Retorna sucesso e dados do usuário
+        // Sanitiza o retorno, sem expor a senha
+        const safeUser = { id: user.id, name: user.name, email: user.email };
+        res.status(201).json({ message: "User created successfully", user: safeUser }); // Retorna sucesso e dados do usuário
     } catch (err) {
         res.status(500).json({ message: "Internal server error", error: err.message }); // Retorna erro interno
     }
@@ -50,8 +51,39 @@ export const login = async (req, res) => {
             { expiresIn: "1h" } // Tempo de expiração
         );
 
-        res.json({ message: "Login successful", token }); // Retorna sucesso e token
+        // Inclui dados do usuário (sem senha) na resposta
+        const safeUser = { id: user.id, name: user.name, email: user.email };
+        res.json({ message: "Login successful", token, user: safeUser }); // Retorna sucesso e token + usuário
     } catch (err) {
         res.status(500).json({ message: "Internal server error", error: err.message }); // Retorna erro interno
+    }
+};
+
+// Retorna os dados do usuário autenticado a partir do token JWT
+export const me = async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization || '';
+        const parts = authHeader.split(' ');
+        if (parts.length !== 2 || parts[0] !== 'Bearer') {
+            return res.status(401).json({ message: 'Missing or invalid Authorization header' });
+        }
+        const token = parts[1];
+
+        let payload;
+        try {
+            payload = jwt.verify(token, JWT_SECRET);
+        } catch (e) {
+            return res.status(401).json({ message: 'Invalid or expired token' });
+        }
+
+        const user = await User.findOne({ where: { id: payload.id } });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const safeUser = { id: user.id, name: user.name, email: user.email };
+        res.json({ user: safeUser });
+    } catch (err) {
+        res.status(500).json({ message: 'Internal server error', error: err.message });
     }
 };
