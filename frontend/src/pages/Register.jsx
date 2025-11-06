@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
@@ -11,6 +12,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     setLoading(true);
@@ -34,6 +36,15 @@ const Register = () => {
       setFullName("");
       setEmail("");
       setPassword("");
+      if (response?.data?.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      if (response?.data?.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      } else {
+        localStorage.setItem("user", JSON.stringify({ name: fullName, email }));
+      }
+      navigate("/directions");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMsg(error.response?.data?.message || "Error creating user");
@@ -117,9 +128,6 @@ const Register = () => {
 
           {errorMsg && (
             <p className="text-red-600 text-center text-sm">{errorMsg}</p>
-          )}
-          {successMsg && (
-            <p className="text-green-600 text-center text-sm">{successMsg}</p>
           )}
 
           <div className="mt-8 flex justify-center">
