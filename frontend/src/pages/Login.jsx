@@ -24,8 +24,14 @@ const Login = () => {
       if (response?.data?.token) {
         localStorage.setItem("token", response.data.token);
       }
-      alert("Login successful!");
-      navigate("/");
+      if (response?.data?.user) {
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      } else {
+        const inferredName = typeof email === 'string' && email.includes('@') ? email.split('@')[0] : '';
+        localStorage.setItem("user", JSON.stringify({ name: inferredName, email }));
+      }
+      localStorage.setItem("passwordLength", String((password || '').length));
+      navigate("/directions");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setErrorMsg(error.response?.data?.message || "Error logging in");
