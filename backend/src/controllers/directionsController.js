@@ -74,3 +74,37 @@ async function setUserLocation(req, res, type) {
 
 export const setHome = (req, res) => setUserLocation(req, res, 'home'); // Endpoint para salvar endereço de casa
 export const setWork = (req, res) => setUserLocation(req, res, 'work'); // Endpoint para salvar endereço de trabalho
+
+// GET /directions/preferences?userId=123
+export const getPreferences = async (req, res) => {
+  try {
+    const { userId } = req.query || {};
+    if (!userId) {
+      return res.status(400).json({ message: "O parâmetro 'userId' é obrigatório." });
+    }
+
+    const prefs = await Preferences.findOne({ where: { userId } });
+    const parseEntry = (val) => {
+      // esperado: "Nome - 2400m, 26min"
+      if (!val || typeof val !== 'string') return null;
+      const [namePart, rest] = val.split(' - ');
+      if (!rest) return { name: namePart };
+      const match = /(\d+(?:\.\d+)?)m,\s*(\d+)min/.exec(rest);
+      let distanceMeters = null, timeMinutes = null, distance = null, time = null;
+      if (match) {
+        distanceMeters = Math.round(parseFloat(match[1]));
+        timeMinutes = parseInt(match[2], 10);
+        distance = distanceMeters >= 1000 ? `${(distanceMeters/1000).toFixed(2)} km` : `${distanceMeters} m`;
+        time = `${timeMinutes} min`;
+      }
+      return { name: namePart, distanceMeters, timeMinutes, distance, time };
+    };
+
+    return res.json({
+      home: parseEntry(prefs?.home),
+      work: parseEntry(prefs?.work),
+    });
+  } catch (err) {
+    return res.status(500).json({ message: "Internal server error", error: err.message });
+  }
+};
