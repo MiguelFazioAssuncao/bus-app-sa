@@ -25,12 +25,16 @@ const Header = () => {
             <input
               type="text"
               placeholder="Where do you want to go?"
+              readOnly
+              onFocus={() => navigate('/search')}
+              onClick={() => navigate('/search')}
               className="w-full bg-[#2D2B2B] text-gray-200 placeholder-[#6C6767] rounded-md pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-(--primary-color)"
             />
             <button
               type="button"
               className="absolute inset-y-0 right-0 px-4 text-gray-300 hover:text-white cursor-pointer"
               aria-label="Search"
+              onClick={() => navigate('/search')}
             >
               <FontAwesomeIcon icon={faSearch} />
             </button>
